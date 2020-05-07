@@ -1,28 +1,75 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <h1>🤦‍♀️🎉💁‍♂️</h1>
+    <h2>Turn your avatar into a party emoji</h2>
+    <Main />
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Main from './components/Main.vue'
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    Main
   }
 }
 </script>
 
 <style>
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+*,
+*:before,
+*:after {
+  box-sizing: border-box;
+}
+
 #app {
   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+  background-color: #39143e;
+  height: 100%;
+  color: #fff;
+  padding-top: 60px;
+}
+
+h1 {
+  font-size: 60px;
+  letter-spacing: 10px;
+  animation: party 2s infinite step-start;
+}
+
+h2 {
+  margin-bottom: 100px;
+}
+
+@keyframes party {
+  0% {
+    filter: hue-rotate(0);
+  }
+
+  20% {
+    filter: hue-rotate(80deg);
+  }
+
+  40% {
+    filter: hue-rotate(200deg);
+  }
+
+  60% {
+    filter: hue-rotate(310deg);
+  }
+
+  80% {
+    filter: hue-rotate(630deg);
+  }
 }
 </style>
