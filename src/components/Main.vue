@@ -10,7 +10,7 @@
     <div v-else>
       <label class="action">
         Upload an image
-        <input type="file" accept="image/*" hidden @change="onFileAdded" />
+        <input type="file" accept="image/jpeg,image/png" hidden @change="onFileAdded" />
       </label>
     </div>
   </div>
