@@ -48,7 +48,7 @@ h1 {
 }
 
 h2 {
-  margin-bottom: 100px;
+  margin-bottom: 30px;
 }
 
 @keyframes party {
