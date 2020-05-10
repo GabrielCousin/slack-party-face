@@ -1,5 +1,7 @@
 # slack-party-face
 
+🤦‍♀️🎉💁‍♂️ Fancy tool to create a Slack compatible party-emoji from your avatar
+
 ## Project setup
 ```
 yarn install
