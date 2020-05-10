@@ -1,7 +1,6 @@
 <template>
   <div id="app">
     <h1>🤦‍♀️🎉💁‍♂️</h1>
-    <h2>Turn your avatar into a party emoji</h2>
     <Main />
   </div>
 </template>
@@ -45,10 +44,6 @@ h1 {
   font-size: 60px;
   letter-spacing: 10px;
   animation: party 2s infinite step-start;
-}
-
-h2 {
-  margin-bottom: 30px;
 }
 
 @keyframes party {

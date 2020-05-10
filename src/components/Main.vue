@@ -1,15 +1,26 @@
 <template>
   <div>
     <canvas ref="canvas" hidden></canvas>
-    <div v-if="resultSrc">
+    <div v-if="isLoading">
+      Processing…
+    </div>
+    <div v-else-if="resultSrc">
       <a :href="resultSrc" download="party.gif">
         <img :src="resultSrc" />
         <div class="action">Download</div>
       </a>
     </div>
     <div v-else>
+      <h2>Create your party-emoji</h2>
+      <div
+        class="dropzone"
+        @dragover.prevent
+        @drop.prevent="onDrop"
+      >
+        Drop a file
+      </div>
       <label class="action">
-        Upload an image
+        Add image
         <input type="file" accept="image/jpeg,image/png" hidden @change="onFileAdded" />
       </label>
     </div>
@@ -28,6 +39,7 @@ export default {
       fileReader: new FileReader(),
       image: new Image(),
       resultSrc: null,
+      isLoading: false,
       gif: new GIF({
         workers: 2,
         workerScript: '/gif.worker.js',
@@ -42,6 +54,19 @@ export default {
     msg: String
   },
   methods: {
+    onDrop(e) {
+      const { files } = e.dataTransfer;
+
+      if(!files) {
+        return;
+      }
+
+      const [file] = files;
+
+      if (['image/jpeg', 'image/png'].includes(file.type)) {
+        this.readFile(file);
+      }
+    },
     draw() {
       const ctx = this.$refs.canvas.getContext('2d');
       const {
@@ -67,7 +92,8 @@ export default {
       });
 
       this.gif.on('finished', (blob) => {
-        this.resultSrc = URL.createObjectURL(blob)
+        this.resultSrc = URL.createObjectURL(blob);
+        this.isLoading = false;
       });
 
       this.gif.render();
@@ -107,9 +133,8 @@ export default {
       }
 
     },
-    onFileAdded(event) {
-      const [imageFile] = event.target.files;
-
+    readFile(imageFile) {
+      this.isLoading = true;
       this.image.onload = this.draw;
 
       this.fileReader.onloadend = () => {
@@ -117,6 +142,10 @@ export default {
       }
 
       this.fileReader.readAsDataURL(imageFile);
+    },
+    onFileAdded(event) {
+      const [imageFile] = event.target.files;
+      this.readFile(imageFile);
     }
   }
 }
@@ -130,8 +159,27 @@ img {
   margin: 0 auto;
 }
 
+h2 {
+  max-width: 500px;
+  font-size: 30px;
+  line-height: 36px;
+  text-transform: uppercase;
+  margin: 0 auto 60px;
+}
+
 a {
   color: #fff;
+}
+.dropzone {
+  margin: 0 auto;
+  padding: 10px 15px;
+  text-align: left;
+  border: 4px dashed #fff;
+  width: 320px;
+  height: 320px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
 }
 
 .action {
