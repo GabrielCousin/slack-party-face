@@ -79,7 +79,7 @@ export default {
       [80, 200, 310, 630].forEach(hue => {
         ctx.canvas.width = GIF_SIZE;
         ctx.canvas.height = GIF_SIZE;
-        ctx.filter = `saturate(250%) hue-rotate(${hue}deg) brightness(110%)`;
+        ctx.filter = `sepia(1) saturate(5) brightness(.9) hue-rotate(${hue}deg)`;
         ctx.drawImage(
           this.image,
           offsetX,
