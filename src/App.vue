@@ -35,9 +35,11 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
   background-color: #39143e;
-  height: 100%;
+  min-height: 100%;
   color: #fff;
   padding-top: 60px;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 h1 {

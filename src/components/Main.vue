@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <main>
     <canvas ref="canvas" hidden></canvas>
     <div v-if="isLoading">
       Processing…
@@ -24,7 +24,7 @@
         <input type="file" accept="image/jpeg,image/png" hidden @change="onFileAdded" />
       </label>
     </div>
-  </div>
+  </main>
 </template>
 
 <script>
@@ -153,6 +153,10 @@ export default {
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
+main {
+  padding-bottom: 30px;
+}
+
 img {
   display: block;
   width: 256px;
