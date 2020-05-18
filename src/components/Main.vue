@@ -46,7 +46,7 @@ export default {
         quality: 10,
         width: GIF_SIZE,
         height: GIF_SIZE,
-        transparent: true
+        transparent: '#ffffff'
       })
     };
   },
