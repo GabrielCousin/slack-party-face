@@ -4,11 +4,16 @@
     <div v-if="isLoading">
       Processing…
     </div>
+    <div v-else-if="errorMsg">
+      <p><strong>Error:</strong> {{errorMsg}}</p>
+      <button class="action" type="button" v-on:click="onReset">Reset</button>
+    </div>
     <div v-else-if="resultSrc">
       <a :href="resultSrc" download="party.gif">
         <img :src="resultSrc" />
         <div class="action">Download</div>
       </a>
+      <button class="action-alt" type="button" v-on:click="onReset">Reset</button>
     </div>
     <div v-else>
       <h2>Create your party-emoji</h2>
@@ -39,26 +44,28 @@ const GIF_SIZE = 256;
 export default {
   name: 'Main',
   data() {
-    return {
-      fileReader: new FileReader(),
-      image: new Image(),
-      resultSrc: null,
-      removeBg: false,
-      isLoading: false,
-      gif: new GIF({
-        workers: 2,
-        workerScript: '/gif.worker.js',
-        quality: 10,
-        width: GIF_SIZE,
-        height: GIF_SIZE,
-        transparent: '#ffffff'
-      })
-    };
-  },
-  props: {
-    msg: String
+    return this.getDefaultData();
   },
   methods: {
+    getDefaultData() {
+      return {
+        fileReader: new FileReader(),
+        image: new Image(),
+        resultSrc: null,
+        removeBg: false,
+        isLoading: false,
+        errorMsg: null,
+        gif: new GIF({
+          workers: 2,
+          workerScript: '/gif.worker.js',
+          quality: 10,
+          width: GIF_SIZE,
+          height: GIF_SIZE,
+          transparent: '#ffffff'
+        })
+      }
+    },
+
     onDrop(e) {
       const { files } = e.dataTransfer;
 
@@ -146,6 +153,7 @@ export default {
       if (this.removeBg) {
         file = await this.loadImageWithoutBg(imageFile);
       }
+      debugger
       this.readFile(file);
     },
 
@@ -158,24 +166,39 @@ export default {
     },
 
     async loadImageWithoutBg(imageFile) {
-      const endpoint = process.env.NODE_ENV === 'production' ?
-        '/remove_bg' :
-        'http://localhost:8081/remove_bg';
+      try {
+        const endpoint = process.env.NODE_ENV === 'production' ?
+          '/remove_bg' :
+          'http://localhost:8081/remove_bg';
 
-      const formData = new FormData();
-      formData.append('image', imageFile);
+        const formData = new FormData();
+        formData.append('image', imageFile);
 
-      const request = await fetch(endpoint, {
-        method: 'POST',
-        body: formData
-      });
+        const request = await fetch(endpoint, {
+          method: 'POST',
+          body: formData
+        });
 
-      return await request.blob();
+        if (request.ok) {
+          return await request.blob();
+        }
+
+        const errorMessage = await request.text();
+        throw new Error(errorMessage);
+      } catch (e) {
+        this.isLoading = false;
+        this.errorMsg = e.message;
+        throw new Error(e.message);
+      }
     },
 
     onFileAdded(event) {
       const [imageFile] = event.target.files;
       this.processFile(imageFile);
+    },
+
+    onReset() {
+      Object.assign(this.$data, this.getDefaultData());
     }
   }
 }
@@ -209,6 +232,27 @@ a {
   cursor: pointer;
   margin-top: 30px;
   display: block;
+  text-transform: uppercase;
+  user-select: none;
+}
+
+.checkbox input {
+  margin: 0 10px 0 0;
+  cursor: pointer;
+  appearance: none;
+}
+
+.checkbox input:before {
+  content: "";
+  display: inline-block;
+  vertical-align: baseline;
+  width: 16px;
+  height: 16px;
+  border: 2px solid #fff;
+}
+
+.checkbox input:checked:before {
+  background-color: #fff;
 }
 
 .dropzone {
@@ -247,5 +291,23 @@ a {
 .action:hover {
   color: #39143e;
   background-color: #fff;
+}
+
+.action-alt {
+  font-family: inherit;
+  font-size: inherit;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 700;
+  padding: 12px 40px;
+  display: block;
+  width: 150px;
+  margin: 10px auto;
+  border: 0;
+  border-radius: 0;
+  outline: none;
+  cursor: pointer;
+  background: none;
+  color: #fff;
 }
 </style>
