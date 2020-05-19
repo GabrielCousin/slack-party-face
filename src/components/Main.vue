@@ -28,6 +28,10 @@
         <input type="checkbox" v-model="removeBg" />
         Remove background
       </label>
+      <p>
+        ℹ –
+        <a target="_blank" rel="noopener noreferrer" href="https://www.remove.bg/r/VsEjUuP5PZedHEPtEympTzef">background removal by remove.bg</a>
+      </p>
       <label class="action">
         Add image
         <input type="file" accept="image/jpeg,image/png" hidden @change="onFileAdded" />
