@@ -19,6 +19,10 @@
       >
         Drop a file
       </div>
+      <label class="checkbox">
+        <input type="checkbox" v-model="removeBg" />
+        Remove background
+      </label>
       <label class="action">
         Add image
         <input type="file" accept="image/jpeg,image/png" hidden @change="onFileAdded" />
@@ -39,6 +43,7 @@ export default {
       fileReader: new FileReader(),
       image: new Image(),
       resultSrc: null,
+      removeBg: false,
       isLoading: false,
       gif: new GIF({
         workers: 2,
@@ -64,9 +69,10 @@ export default {
       const [file] = files;
 
       if (['image/jpeg', 'image/png'].includes(file.type)) {
-        this.readFile(file);
+        this.processFile(file);
       }
     },
+
     draw() {
       const ctx = this.$refs.canvas.getContext('2d');
       const {
@@ -98,6 +104,7 @@ export default {
 
       this.gif.render();
     },
+
     getImageOptions(image) {
       const { width, height } = image;
 
@@ -131,21 +138,44 @@ export default {
         width: GIF_SIZE,
         height: GIF_SIZE
       }
-
     },
-    readFile(imageFile) {
-      this.isLoading = true;
-      this.image.onload = this.draw;
 
+    async processFile(imageFile) {
+      this.isLoading = true;
+      let file = imageFile;
+      if (this.removeBg) {
+        file = await this.loadImageWithoutBg(imageFile);
+      }
+      this.readFile(file);
+    },
+
+    readFile(imageFile) {
+      this.image.onload = this.draw;
       this.fileReader.onloadend = () => {
         this.image.src = this.fileReader.result;
-      }
-
+      };
       this.fileReader.readAsDataURL(imageFile);
     },
+
+    async loadImageWithoutBg(imageFile) {
+      const endpoint = process.env.NODE_ENV === 'production' ?
+        '/remove_bg' :
+        'http://localhost:8081/remove_bg';
+
+      const formData = new FormData();
+      formData.append('image', imageFile);
+
+      const request = await fetch(endpoint, {
+        method: 'POST',
+        body: formData
+      });
+
+      return await request.blob();
+    },
+
     onFileAdded(event) {
       const [imageFile] = event.target.files;
-      this.readFile(imageFile);
+      this.processFile(imageFile);
     }
   }
 }
@@ -174,6 +204,13 @@ h2 {
 a {
   color: #fff;
 }
+
+.checkbox {
+  cursor: pointer;
+  margin-top: 30px;
+  display: block;
+}
+
 .dropzone {
   margin: 0 auto;
   padding: 10px 15px;
