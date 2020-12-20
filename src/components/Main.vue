@@ -157,7 +157,6 @@ export default {
       if (this.removeBg) {
         file = await this.loadImageWithoutBg(imageFile);
       }
-      debugger
       this.readFile(file);
     },
 
