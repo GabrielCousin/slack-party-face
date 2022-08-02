@@ -1,13 +1,10 @@
-import Vue, { createApp } from 'vue';
+import { createApp } from 'vue'
 import App from './App.vue'
-import * as Sentry from '@sentry/browser';
-import { Vue as VueIntegration } from '@sentry/integrations';
+import * as Sentry from '@sentry/vue'
+
+const app = createApp(App).mount('#app')
 
 Sentry.init({
-  dsn: process.env.VUE_APP_SENTRY_DSN,
-  integrations: [
-    new VueIntegration({ Vue, attachProps: true })
-  ],
-});
-
-createApp(App).mount('#app')
+  app,
+  dsn: import.meta.env.VUE_APP_SENTRY_DSN,
+})

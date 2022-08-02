@@ -1,20 +1,13 @@
+<script setup lang="ts">
+import AppContainer from './components/AppContainer.vue'
+</script>
+
 <template>
   <div id="app">
     <h1>🤦‍♀️🎉💁‍♂️</h1>
-    <Main />
+    <AppContainer />
   </div>
 </template>
-
-<script>
-import Main from './components/Main.vue'
-
-export default {
-  name: 'App',
-  components: {
-    Main
-  }
-}
-</script>
 
 <style>
 html,
