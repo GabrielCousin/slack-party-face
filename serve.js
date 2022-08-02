@@ -6,9 +6,10 @@ const REMOVE_BG_API_KEY = process.env.REMOVE_BG_API_KEY
 const express = require('express')
 const http = require('http')
 const path = require('path')
-const request = require('request')
+const fetch = require('node-fetch')
 const multer = require('multer')
 const cors = require('cors')
+const FormData = require('form-data')
 
 const storage = multer.memoryStorage()
 const upload = multer({ storage: storage })
@@ -26,28 +27,32 @@ app.get('*', (_req, res) => {
   res.sendFile(path.join(__dirname, 'dist', 'index.html'))
 })
 
-app.post('/remove_bg', upload.single('image'), (req, res) => {
-  request.post(
-    {
-      url: 'https://api.remove.bg/v1.0/removebg',
-      formData: {
-        image_file: req.file.buffer,
-        size: 'auto',
-      },
+app.post('/remove_bg', upload.single('image'), async (req, res) => {
+  const formData = new FormData()
+  formData.append('image_file', req.file.buffer)
+  formData.append('size', 'auto')
+
+  try {
+    const response = await fetch('https://api.remove.bg/v1.0/removebg', {
+      method: 'post',
+      body: formData,
       headers: {
         'X-Api-Key': REMOVE_BG_API_KEY,
       },
-      encoding: null,
-    },
-    function (error, response, body) {
-      if (error) {
-        res.status(500).send('Something broke!')
-      } else if (response.statusCode != 200) {
-        const message = JSON.parse(body).errors[0].title
-        res.status(response.statusCode).send(message)
-      } else {
-        res.send(body)
-      }
+    })
+
+    if (response.ok) {
+      const blob = await response.blob()
+      const ab = await blob.arrayBuffer()
+      res.send(Buffer.from(ab))
+      return
     }
-  )
+
+    const data = await response.json()
+    const message = data.errors[0].title
+    res.status(response.status).send(message)
+  } catch (e) {
+    console.log('err', e.message)
+    res.status(500).send('Something broke!')
+  }
 })
