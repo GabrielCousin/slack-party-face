@@ -174,15 +174,15 @@ export default {
     async loadImageWithoutBg(imageFile) {
       try {
         const endpoint = import.meta.env.PROD
-          ? '/remove_bg'
+          ? '/api/remove_bg'
           : 'http://localhost:8081/remove_bg'
-
-        const formData = new FormData()
-        formData.append('image', imageFile)
 
         const request = await fetch(endpoint, {
           method: 'POST',
-          body: formData,
+          body: imageFile,
+          headers: {
+            'Content-Type': 'application/octet-stream',
+          },
         })
 
         if (request.ok) {
